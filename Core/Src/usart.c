@@ -24,6 +24,12 @@
 
 #include <stdio.h>
 
+#define MAX_NUMBER_OF_WRITES      	10 /* Maximum number of log entries */
+#define BUFFER_SIZE					50 /* Size of the buffer for log entries */
+#define UART_TIMEOUT				0xFFFF /* Maximum timeout value for HAL_UART_Transmit */
+
+uint32_t number_of_uart_fails = 0;
+
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
@@ -235,18 +241,45 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 }
 
 /* USER CODE BEGIN 1 */
+/**
+  * @brief  Prints the temperature log over UART.
+  *
+  * This function iterates through the temperature values stored in the provided array.
+  * For each temperature value, it formats the value along with its index into a string and transmits it over UART.
+  * The string is formatted as "<index>: <temperature>\r\n" and is sent via the UART peripheral (USART3).
+  *
+  * @param  array: Pointer to an array containing temperature values to be transmitted.
+  *
+  * @retval HAL_StatusTypeDef: Returns HAL_OK if all transmissions were successful.
+  * 							Returns HAL_ERROR if the argument is a null pointer.
+  * 							Returns HAL_ERROR if the size of the resulting string is larger than the buffer.
+  *                             Otherwise, it returns the appropriate error status from HAL_UART_Transmit.
+  */
+HAL_StatusTypeDef Print_Temperature_Log(uint8_t *array) {
+    HAL_StatusTypeDef status = HAL_OK;
+    uint8_t buffer[BUFFER_SIZE];  // Replaced magic number with constant
 
-HAL_StatusTypeDef Print_Temperature_Log(int *array){
+    if(array == NULL){
+    	return HAL_ERROR;
+    }
 
-	HAL_StatusTypeDef status = HAL_OK;
-	char buffer[50];
+    for (int n = 0; n < MAX_NUMBER_OF_WRITES; n++) {
 
-	for(int n = 0; n < 10; n++){
-		sprintf(buffer, "%d: %d\r\n", n+1, array[n]);
-		status = HAL_UART_Transmit(&huart3, (uint8_t *)buffer, strlen(buffer), 0xFFFF);
-	}
+        // Create the log entry
+        snprintf((char *)buffer, BUFFER_SIZE, "%d: %d\r\n", n + 1, array[n]);
+        if(strlen((char *)buffer) > BUFFER_SIZE){
+        	return HAL_ERROR;
+        }
 
-	return status;
+        // Transmit the log entry over UART
+        status = HAL_UART_Transmit(&huart3, buffer, strlen((char *)buffer), UART_TIMEOUT);
+        if (status != HAL_OK) {
+        	number_of_uart_fails++;
+            return status;  // Handle UART transmission error
+        }
+    }
+
+    return status;
 }
 
 /* USER CODE END 1 */

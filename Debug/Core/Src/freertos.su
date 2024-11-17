@@ -1,4 +1,6 @@
-../Core/Src/freertos.c:87:6:MX_FREERTOS_Init	8	static
-../Core/Src/freertos.c:132:6:StartDefaultTask	24	static
-../Core/Src/freertos.c:155:6:StartTask02	16	static
-../Core/Src/freertos.c:170:5:get_temperature	8	static
+../Core/Src/freertos.c:109:6:MX_FREERTOS_Init	8	static
+../Core/Src/freertos.c:158:6:StartDefaultTask	24	static
+../Core/Src/freertos.c:209:6:StartTask02	24	static
+../Core/Src/freertos.c:266:12:get_temperature	16	static
+../Core/Src/freertos.c:279:10:generate_random	16	static
+../Core/Src/freertos.c:302:10:random_in_range	32	static
