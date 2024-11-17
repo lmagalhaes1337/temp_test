@@ -1,0 +1,4 @@
+../Core/Src/freertos.c:87:6:MX_FREERTOS_Init	1
+../Core/Src/freertos.c:132:6:StartDefaultTask	2
+../Core/Src/freertos.c:155:6:StartTask02	1
+../Core/Src/freertos.c:170:5:get_temperature	1

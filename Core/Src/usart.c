@@ -22,6 +22,8 @@
 
 /* USER CODE BEGIN 0 */
 
+#include <stdio.h>
+
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
@@ -233,5 +235,18 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 }
 
 /* USER CODE BEGIN 1 */
+
+HAL_StatusTypeDef Print_Temperature_Log(int *array){
+
+	HAL_StatusTypeDef status = HAL_OK;
+	char buffer[50];
+
+	for(int n = 0; n < 10; n++){
+		sprintf(buffer, "%d: %d\r\n", n+1, array[n]);
+		status = HAL_UART_Transmit(&huart3, (uint8_t *)buffer, strlen(buffer), 0xFFFF);
+	}
+
+	return status;
+}
 
 /* USER CODE END 1 */

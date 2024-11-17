@@ -117,7 +117,7 @@ int main(void)
   MX_OCTOSPI1_Init();
   MX_OCTOSPI2_Init();
   MX_SAI1_Init();
-  MX_SDMMC1_SD_Init();
+  //MX_SDMMC1_SD_Init();
   MX_TIM1_Init();
   MX_TIM4_Init();
   MX_TIM5_Init();

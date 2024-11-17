@@ -46,6 +46,8 @@ void MX_USART3_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
+HAL_StatusTypeDef Print_Temperature_Log(int *array);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

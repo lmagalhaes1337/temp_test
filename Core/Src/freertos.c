@@ -26,6 +26,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "usart.h"
+#include "stdlib.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,6 +48,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+int temperature_log[10];
+int temp_index = 0;
 
 /* USER CODE END Variables */
 /* Definitions for printToTerm */
@@ -64,6 +69,8 @@ const osThreadAttr_t getTemp_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+
+int get_temperature(void);
 
 /* USER CODE END FunctionPrototypes */
 
@@ -128,7 +135,12 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  temperature_log[temp_index] = get_temperature();
+	  temp_index++;
+	  if(temp_index >= 10){
+		  temp_index = 0;
+	  }
+	  osDelay(1000);
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -146,13 +158,20 @@ void StartTask02(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  Print_Temperature_Log(temperature_log);
+	  osDelay(5000);
   }
   /* USER CODE END StartTask02 */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
+int get_temperature(void){
+
+	return rand() % 41;
+
+}
 
 /* USER CODE END Application */
 
