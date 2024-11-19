@@ -22,13 +22,11 @@
 
 /* USER CODE BEGIN 0 */
 
-#include <stdio.h>
-
 #define MAX_NUMBER_OF_WRITES      	10 /* Maximum number of log entries */
 #define BUFFER_SIZE					50 /* Size of the buffer for log entries */
 #define UART_TIMEOUT				0xFFFF /* Maximum timeout value for HAL_UART_Transmit */
 
-uint32_t number_of_uart_fails = 0;
+static uint32_t number_of_uart_fails = 0; /* Variable that holds the number of times the UART has failed the transmission */
 
 /* USER CODE END 0 */
 
@@ -281,5 +279,4 @@ HAL_StatusTypeDef Print_Temperature_Log(uint8_t *array) {
 
     return status;
 }
-
 /* USER CODE END 1 */

@@ -29,6 +29,7 @@
 #include "usart.h"
 #include "stdlib.h"
 #include "cmsis_os2.h"
+#include "utils.h"
 
 /* USER CODE END Includes */
 
@@ -45,15 +46,15 @@
 #define RNG_INCREMENT  1013904223U /* Increment for Linear Congruential Generator */
 #define RNG_MODULUS    0xFFFFFFFFU /* Modulus for Linear Congruential Generator */
 
+
 /* Application-specific defines */
-#define MAX_TEMP_INDEX      10 /* Maximum number of temperature log entries */
+
 #define TEMP_LOG_DELAY_MS   1000 /* Delay between temperature log entries in ms */
 #define PRINT_LOG_DELAY_MS  5000 /* Delay between log prints in ms */
 #define TEMP_WRITE_DELAY 1000U /* Delay for writing the temperature log entry */
 #define LOG_PRINT_DELAY  5000U /* Delay for printing the temperature log */
 #define MAX_RETRIES			10 /* Maximum number of retries for the mutex acquire and release functions */
-#define MIN_VAL_FOR_RAND	0 /* Minimum value allowed for the simulated temperature function */
-#define MAX_VAL_FOR_RAND	40 /* Maximum value allowed for the simulated temperature function */
+
 #define MAX_MUTEX_WAIT		500 /* Maximum mutex wait time in miliseconds */
 
 /* USER CODE END PD */
@@ -65,9 +66,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-static uint8_t temperature_log[MAX_TEMP_INDEX] = {0};
-static uint8_t temp_index = 0;
-static uint32_t seed = 12345U; /* Example seed value */
+
 osMutexId_t logMutexHandle;
 
 /* USER CODE END Variables */
@@ -88,11 +87,6 @@ const osThreadAttr_t getTemp_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-
-static int get_temperature(void);
-uint32_t generate_random(uint32_t *seed);
-uint32_t random_in_range(uint32_t *seed, uint32_t min, uint32_t max);
-
 
 /* USER CODE END FunctionPrototypes */
 
@@ -164,35 +158,32 @@ void StartDefaultTask(void *argument)
   for(;;)
   {
 
-	  if (temp_index < MAX_TEMP_INDEX) {
-		  /* Acquire mutex to ensure exclusive access to temperature log */
-		  while(retries < MAX_RETRIES){
-			  status = osMutexAcquire(logMutexHandle, MAX_MUTEX_WAIT);
-			  if(status == osOK){
-				  break;
-			  }
-			  retries++;
-		  }
-		  if(status != osOK){
-			  continue;
-		  }
-		  retries = 0;
-		  /* Simulate logging a temperature value */
-	      temperature_log[temp_index] = get_temperature();
-	      /* Release the mutex after updating the log */
-	      while(retries < MAX_RETRIES){
-	    	  status = osMutexRelease(logMutexHandle);
-			  if(status == osOK){
-				  break;
-			  }
-			  retries++;
-	      }
-	      retries = 0;
 
-	      temp_index++; /* Increment the log index */
-	  } else {
-	      temp_index = 0; /* Reset log index if maximum log size reached */
+	/* Acquire mutex to ensure exclusive access to temperature log */
+	while(retries < MAX_RETRIES){
+	  status = osMutexAcquire(logMutexHandle, MAX_MUTEX_WAIT);
+	  if(status == osOK){
+		  break;
 	  }
+	  retries++;
+	}
+	if(status != osOK){
+	  continue;
+	}
+	retries = 0;
+	/* Simulate logging a temperature value */
+	add_new_temp_value();
+	/* Release the mutex after updating the log */
+	while(retries < MAX_RETRIES){
+	  status = osMutexRelease(logMutexHandle);
+	  if(status == osOK){
+		  break;
+	  }
+	  retries++;
+	}
+	retries = 0;
+
+
 	  osDelay(TEMP_WRITE_DELAY); /* Delay between temperature log entries */
   }
   /* USER CODE END StartDefaultTask */
@@ -257,60 +248,6 @@ void StartTask02(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-
-/**
-  * @brief  Simulates retrieving the current temperature using random number generation
-  * @retval Temperature value
-  * @note	This function will always return a random value between 0 and 40 as those were the values chosen
-  */
-static int get_temperature(void){
-
-	uint32_t temp = random_in_range(&seed, MIN_VAL_FOR_RAND, MAX_VAL_FOR_RAND);
-	return (int)temp; /* Ensure range is valid */
-
-}
-
-/**
-  * @brief  Generates the next random number using Linear Congruential Generator (LCG)
-  * @param  seed Pointer to the seed value
-  * @retval Generated random number
-  * @note   This function updates the seed and returns the next random value.
-  */
-uint32_t generate_random(uint32_t *seed)
-{
-    /* Ensure the seed pointer is valid */
-    if (seed == NULL)
-    {
-        return 0; /* Error case, return a default value */
-    }
-
-    /* Update the seed using the LCG formula */
-    *seed = (RNG_MULTIPLIER * (*seed) + RNG_INCREMENT) & RNG_MODULUS;
-
-    /* Return the generated random number */
-    return *seed;
-}
-
-/**
-  * @brief  Generates a random number in a specified range
-  * @param  seed Pointer to the seed value
-  * @param  min Minimum value of the range
-  * @param  max Maximum value of the range
-  * @retval Random number within the specified range
-  * @note   This function scales the random value to the desired range [min, max].
-  */
-uint32_t random_in_range(uint32_t *seed, uint32_t min, uint32_t max)
-{
-	/* Ensure valid input range */
-    if (seed == NULL || min > max)
-    {
-        return 0; /* Error case, return a default value */
-    }
-
-    /* Generate a random number and scale it to the desired range */
-    uint32_t rand_value = generate_random(seed);
-    return min + (rand_value % (max - min + 1));
-}
 
 /* USER CODE END Application */
 

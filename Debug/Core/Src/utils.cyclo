@@ -1,0 +1,5 @@
+../Core/Src/utils.c:27:17:generate_random	2
+../Core/Src/utils.c:50:17:random_in_range	3
+../Core/Src/utils.c:68:5:get_temperature	1
+../Core/Src/utils.c:78:6:add_new_temp_value	2
+../Core/Src/utils.c:95:10:get_temperature_log	1

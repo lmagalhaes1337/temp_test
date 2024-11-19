@@ -2,4 +2,4 @@
 ../Core/Src/usart.c:82:6:MX_USART3_UART_Init	8	static
 ../Core/Src/usart.c:125:6:HAL_UART_MspInit	240	static
 ../Core/Src/usart.c:200:6:HAL_UART_MspDeInit	16	static
-../Core/Src/usart.c:254:19:Print_Temperature_Log	88	static
+../Core/Src/usart.c:256:19:Print_Temperature_Log	88	static
